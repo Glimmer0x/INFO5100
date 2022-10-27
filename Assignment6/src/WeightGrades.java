@@ -48,6 +48,11 @@ import java.awt.event.ActionListener;
       totalWeightedGrade = calculateTotalWeightedGrade();
     }
 
+    /**
+     * @MethodName WeightGrades
+     * @Author Liangxi Liu
+     * @Description Construction function. Add click event for calcualteScoreButton
+     */
     public WeightGrades(){
       calcualteScoreButton.addActionListener(new ActionListener()
       {
