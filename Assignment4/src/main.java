@@ -16,16 +16,18 @@ public class main
   public static void main(String[] args)
   {
     ExtendWeightGrades ewg = new ExtendWeightGrades();
-    Double[] tp = new Double[8];
-    Double[] ep = new Double[8];
-    Double[] ptg =  new Double[8];
+
     Scanner inputs = new Scanner(System.in);
 
     System.out.println("Enter the number of total assignments:");
     int num = Integer.parseInt(inputs.nextLine());
+    Double[] tp = new Double[num];
+    Double[] ep = new Double[num];
+    Double[] ptg =  new Double[num];
 
     System.out.println("Enter total points:");
     String[] tpInputs = inputs.nextLine().split(",");
+
     for(int i=0; i<tpInputs.length;i++){
       tp[i]=Double.parseDouble(tpInputs[i]);
     }
@@ -40,12 +42,14 @@ public class main
     for(int i=0; i<ptInputs.length;i++){
       ptg[i]=Double.parseDouble(ptInputs[i]);
     }
+
     ewg.setTotalAssignments(num);
     ewg.setPointTotal(Arrays.asList(tp));
     ewg.setAssignmentPercentage(Arrays.asList(ptg));
     ewg.setEarnedPoints(Arrays.asList(ep));
     ewg.calculateExtendTotalWeightedGrade();
-    System.out.println(ewg.getGradeClass());
+    System.out.println("Extend Total Weighted Grade: "+ewg.getExtendTotalWeightedGrade());
+    System.out.println("Grade Class : "+ewg.getGradeClass());
 
   }
 }

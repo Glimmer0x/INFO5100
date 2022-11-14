@@ -23,6 +23,7 @@ public class main
 //    ewg.setAssignmentPercentage(Arrays.asList(ptg1));
 //    ewg.setEarnedPoints(Arrays.asList(ep1));
 //    ewg.calculateExtendTotalWeightedGrade();
+//    System.out.println(ewg.getExtendTotalWeightedGrade());
 //    System.out.println(ewg.getGradeClass());
 
     Double[] tp = new Double[8];
@@ -49,7 +50,8 @@ public class main
     ewg.setAssignmentPercentage(Arrays.asList(ptg));
     ewg.setEarnedPoints(Arrays.asList(ep));
     ewg.calculateExtendTotalWeightedGrade();
-    System.out.println(ewg.getGradeClass());
+    System.out.println("Extend Total Weighted Grade: "+ewg.getExtendTotalWeightedGrade());
+    System.out.println("Grade Class: " + ewg.getGradeClass());
 
   }
 }
