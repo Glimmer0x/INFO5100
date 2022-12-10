@@ -123,7 +123,28 @@ public class WalletPanel extends JPanel
       new AddCoinDialog().setVisible(true);
       walletTable.updateUI();
     });
-    transferToOneButton.addActionListener(e -> new TransferToOneDialog().setVisible(true));
+    deleteButton.addActionListener(e -> {
+      Integer row= walletTable.getSelectedRow();
+      if(row != null){
+        String s = (String) tableModel.getValueAt(row, 2);
+        Model.deleteCoin(s);
+        tableModel.removeRow(row);
+        walletTable.updateUI();
+      }
+      else {
+        new ErrorDialog("Please select a coin!");
+      }
+    });
+    transferToOneButton.addActionListener(e -> {
+      Integer row= walletTable.getSelectedRow();
+      if(row != null){
+        String s = (String) tableModel.getValueAt(row, 2);
+        new TransferToOneDialog(s).setVisible(true);
+      }
+      else {
+        new ErrorDialog("Please select a coin!");
+      }
+    });
     transferToBatch.addActionListener(e -> new BatchTransferDialog().setVisible(true));
   }
 }

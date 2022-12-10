@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @ClassNAME transferToOneDialog
@@ -17,8 +20,9 @@ public class TransferToOneDialog extends JDialog
   private JTextField amountInput;
   private JButton cancelButton;
   private JButton confirmButton;
+  private String coinAddress;
 
-  public TransferToOneDialog(){
+  public TransferToOneDialog(String _coinAddress){
     dialogPanel = new JPanel();
     addressLabel = new JLabel("Input receiver's address:");
     addressInput = new JTextField();
@@ -26,6 +30,7 @@ public class TransferToOneDialog extends JDialog
     amountInput = new JTextField();
     cancelButton = new JButton("Cancel");
     confirmButton = new JButton("Confirm");
+    coinAddress = _coinAddress;
 
     setSize(200, 150);
 
@@ -99,6 +104,20 @@ public class TransferToOneDialog extends JDialog
   public void initListener(){
     cancelButton.addActionListener(e -> {
       setVisible(false);
+      dispose();
+    });
+
+    confirmButton.addActionListener(e -> {
+      String receiver = addressInput.getText();
+
+      try {
+        Double amount = Double.parseDouble(amountInput.getText());
+        Model.transferCoin(coinAddress,receiver, amount);
+        TransactionPanel.updateTableUI();
+      }
+      catch (Exception ex) {
+        new ErrorDialog(ex.getMessage());
+      }
       dispose();
     });
   }

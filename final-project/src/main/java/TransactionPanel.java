@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Vector;
 
 /**
  * @ClassNAME TranscationPanel
@@ -16,7 +18,7 @@ public class TransactionPanel extends JPanel
       "Status", "From", "To", "Coin", "Out", "Hash"};
 
   private JScrollPane transactionWrap;
-  private JTable transactionTable;
+  private static JTable transactionTable;
   private DefaultTableModel tableModel;
 
   public TransactionPanel(){
@@ -28,7 +30,7 @@ public class TransactionPanel extends JPanel
       }
     };
 
-    tableModel = new DefaultTableModel( new String[][]{ COLUMN_NAMES }, COLUMN_NAMES);
+    tableModel = new DefaultTableModel( Model.getTransactionTable(), new Vector<String>(Arrays.asList(COLUMN_NAMES)));
     transactionTable.setModel(tableModel);
     transactionTable.setFont(new Font("Times New Roman", Font.PLAIN, 14));
     transactionTable.getTableHeader().setPreferredSize(new Dimension(100, 20));
@@ -37,6 +39,10 @@ public class TransactionPanel extends JPanel
     transactionWrap = new JScrollPane(transactionTable);
     transactionWrap.createVerticalScrollBar();
     add(transactionWrap);
+  }
+
+  public static void updateTableUI(){
+    transactionTable.updateUI();
   }
 
 }

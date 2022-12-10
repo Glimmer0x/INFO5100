@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
@@ -15,8 +16,9 @@ public class Model
 {
   private static Account account = new Account();
 
-  private static HashMap<String, Vector<String>> walletTableMap;;
+  private static HashMap<String, Integer> walletTableMap;;
   private static Vector<Vector<String>> walletTable;
+  private static Vector<Vector<String>> transactionTable = new Vector<>();
   private static ArrayList<String> coins = new ArrayList<>(){
     {
       add("eth");
@@ -29,9 +31,6 @@ public class Model
   {
     walletTableMap = initWalletTableMap();
   }
-
-//  private static Vector<Vector<String>> walletTable = new Vector<>();
-  private static Vector<Vector<String>> transactionTable = new Vector<>();
 
   public static Account getAccount()
   {
@@ -55,10 +54,11 @@ public class Model
 
   }
 
-  public static HashMap<String,Vector<String>> initWalletTableMap()
+  public static HashMap<String,Integer> initWalletTableMap()
       throws ExecutionException, InterruptedException, TimeoutException
   {
-    HashMap<String, Vector<String>> tableMap = new HashMap<>();
+    HashMap<String, Integer> tableMap = new HashMap<>();
+    walletTable = new Vector<Vector<String>>();
     for (String coinAddress: coins
          ) {
       if(coinAddress.equals("eth")){
@@ -67,14 +67,15 @@ public class Model
         String ethBalance = account.getBalance();
         ethRow.add(ethBalance);
         ethRow.add("The Gas. No Address");
-        tableMap.put(coinAddress, ethRow);
+        tableMap.put(coinAddress, walletTable.size());
+        walletTable.add(ethRow);
       }
       else {
         Vector<String> coinRow = account.getCoinInfoByAddress(coinAddress);
-        tableMap.put(coinAddress, coinRow);
+        tableMap.put(coinAddress, walletTable.size());
+        walletTable.add(coinRow);
       }
     }
-    walletTable = new Vector<Vector<String>>(tableMap.values());
     return tableMap;
   }
 
@@ -87,21 +88,21 @@ public class Model
     for (String key: coins
          ) {
       if(key.equals("eth")){
-        Vector<String> ethRow = walletTableMap.get(key);
+        Vector<String> ethRow = walletTable.get(walletTableMap.get(key));
         String preBalance = ethRow.get(1);
         String newBalance = account.getBalance();
         if(!preBalance.equals(newBalance)) ethRow.set(1 , newBalance);
       }
       else{
         if(walletTableMap.containsKey(key)){
-          Vector<String> coinRow = walletTableMap.get(key);
+          Vector<String> coinRow = walletTable.get(walletTableMap.get(key));
           String preBalance = coinRow.get(1);
           String newBalance = account.getCoinBalance(key);
           if(!preBalance.equals(newBalance)) coinRow.set(1 , newBalance);
         }
         else {
           Vector<String> coinRow = account.getCoinInfoByAddress(key);
-          walletTableMap.put(key, coinRow);
+          walletTableMap.put(key, walletTable.size());
           walletTable.add(coinRow);
         }
       }
@@ -112,5 +113,18 @@ public class Model
     coins.add(s);
   }
 
+  public static void deleteCoin(String s){
+    if(s.contains("GAS")) s = "eth";
+    Integer idx = walletTableMap.get(s);
+    coins.remove(idx);
+    walletTable.remove(idx);
+  }
+
+  public static void transferCoin(String coinAddress, String receiver, Double amount)
+      throws IOException, ExecutionException, InterruptedException, TimeoutException
+  {
+    Vector<String> transLog = account.transferCoin(coinAddress, receiver, amount);
+    transactionTable.add(transLog);
+  }
 
 }

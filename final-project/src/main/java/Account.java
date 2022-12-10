@@ -11,12 +11,16 @@ import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Convert;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -99,8 +103,41 @@ public class Account
     return coinInfo;
   }
 
+  public Vector<String> transferCoin(String coinAddress, String receiver, Double amount)
+      throws ExecutionException, InterruptedException, TimeoutException, IOException
+  {
+    EthGasPrice ethGasPrice = web3j.ethGasPrice().sendAsync().get(5, TimeUnit.SECONDS);
+    ERC20 coin = ERC20.load(coinAddress, web3j, credentials, new StaticGasProvider(ethGasPrice.getGasPrice(), BigInteger.valueOf(60000L)));
+    String symbol = coin.symbol().sendAsync().get(5, TimeUnit.SECONDS);
+    BigInteger decimal = coin.decimals().sendAsync().get(5, TimeUnit.SECONDS);
+    BigDecimal value = new BigDecimal(Math.pow(10, decimal.intValue()));
+    value = value.multiply(BigDecimal.valueOf(amount));
+
+    TransactionReceipt trans = coin.transfer(receiver, value.toBigInteger()).sendAsync().get(20, TimeUnit.SECONDS);
+
+    String hash= trans.getTransactionHash();
+
+    String status = trans.getStatus();
+    if(status.equals("0x1")) status = "Success";
+    else status = "Fail";
+
+    Vector<String> transLog = new Vector<>();
+    transLog.add(status);
+    transLog.add(address);
+    transLog.add(receiver);
+    transLog.add(symbol);
+    transLog.add(amount.toString());
+    transLog.add(hash);
+
+    return transLog;
+  }
+
   public static void main(String[] args) throws Exception
   {
+
+    Account a = new Account();
+    a.transferCoin("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", 0.00001);
+
   }
 
 }
