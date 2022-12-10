@@ -31,6 +31,9 @@ public class TransferToOneDialog extends JDialog
     cancelButton = new JButton("Cancel");
     confirmButton = new JButton("Confirm");
     coinAddress = _coinAddress;
+    if(coinAddress.contains("Gas")){
+      coinAddress = "eth";
+    }
 
     setSize(200, 150);
 
@@ -112,8 +115,10 @@ public class TransferToOneDialog extends JDialog
 
       try {
         Double amount = Double.parseDouble(amountInput.getText());
-        Model.transferCoin(coinAddress,receiver, amount);
-        TransactionPanel.updateTableUI();
+//        Model.transferCoin(coinAddress,receiver, amount);
+//        TransactionPanel.updateTableUI();
+        Model.TransactionWorker transactionWorker = Model.getTransactionWorker(coinAddress, receiver, amount);
+        transactionWorker.execute();
       }
       catch (Exception ex) {
         new ErrorDialog(ex.getMessage());

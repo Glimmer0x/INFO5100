@@ -1,11 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @ClassNAME MainFrame
@@ -93,6 +87,8 @@ public class MainFrame extends JFrame
     changeButton.addActionListener(e->{
       new ChangeAccountDialog().setVisible(true);
       updateAddress();
+      Model.WalletWorker walletWorker = Model.getWalletWorker();
+      walletWorker.execute();
     });
   }
 

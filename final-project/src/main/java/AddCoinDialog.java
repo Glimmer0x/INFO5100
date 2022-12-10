@@ -16,7 +16,8 @@ public class AddCoinDialog extends AddDialog
         String coinAddress = super.getInput();
         Model.addCoinAddress(coinAddress);
       try {
-        Model.updateWalletTableMap();
+        Model.WalletWorker walletWorker = Model.getWalletWorker();
+        walletWorker.execute();
       }
       catch (Exception ex) {
         new ErrorDialog(ex.getMessage());

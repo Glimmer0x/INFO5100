@@ -14,8 +14,9 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Convert;
@@ -106,6 +107,7 @@ public class Account
   public Vector<String> transferCoin(String coinAddress, String receiver, Double amount)
       throws ExecutionException, InterruptedException, TimeoutException, IOException
   {
+    System.out.println("Start ----- Transfer Coin");
     EthGasPrice ethGasPrice = web3j.ethGasPrice().sendAsync().get(5, TimeUnit.SECONDS);
     ERC20 coin = ERC20.load(coinAddress, web3j, credentials, new StaticGasProvider(ethGasPrice.getGasPrice(), BigInteger.valueOf(60000L)));
     String symbol = coin.symbol().sendAsync().get(5, TimeUnit.SECONDS);
@@ -127,17 +129,48 @@ public class Account
     transLog.add(receiver);
     transLog.add(symbol);
     transLog.add(amount.toString());
-    transLog.add(hash);
-
+    transLog.add(getHyperLink(hash));
+    System.out.println("End ----- Transfer Coin");
     return transLog;
+  }
+
+  public Vector<String> transferEth(String receiver, Double amount)
+      throws TransactionException, IOException, InterruptedException, ExecutionException, TimeoutException
+  {
+    System.out.println("Start ----- Transfer BNB");
+    TransactionReceipt transactionReceipt = Transfer.sendFunds(
+        web3j, credentials, receiver,
+        BigDecimal.valueOf(amount), Convert.Unit.ETHER).sendAsync().get(20, TimeUnit.SECONDS);
+
+    String hash = transactionReceipt.getTransactionHash();
+
+    String status = transactionReceipt.getStatus();
+    if(status.equals("0x1")) status = "Success";
+    else status = "Fail";
+
+    Vector<String> transLog = new Vector<>();
+    transLog.add(status);
+    transLog.add(address);
+    transLog.add(receiver);
+    transLog.add("BNB");
+    transLog.add(amount.toString());
+    transLog.add(getHyperLink(hash));
+    System.out.println("End ----- Transfer BNB");
+    return transLog;
+  }
+
+  public String getHyperLink(String hash){
+    // String link = "https://testnet.bscscan.com/tx/" + hash;
+    // String hyperLink = "<html><a href='"+ link + "'>"+ hash + "</a></html>";
+    return hash;
   }
 
   public static void main(String[] args) throws Exception
   {
 
-    Account a = new Account();
-    a.transferCoin("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", 0.00001);
-
+    // Account a = new Account();
+    // a.transferCoin("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", 0.00001);
+    // a.transferEth("0xF833a39F41BA86F7E7aB0BcB17f27Bf412610F08", 0.00001);
   }
 
 }
