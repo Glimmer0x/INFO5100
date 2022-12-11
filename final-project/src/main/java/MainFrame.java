@@ -48,6 +48,8 @@ public class MainFrame extends JFrame
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     setContentPane(mainPanel);
+
+    Model.getWalletWorker().execute();
   }
 
   public void initLayout(){

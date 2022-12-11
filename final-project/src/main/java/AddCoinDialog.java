@@ -14,8 +14,8 @@ public class AddCoinDialog extends AddDialog
     super("Input a new coin address:");
     super.setConfirmListener(e -> {
         String coinAddress = super.getInput();
-        Model.addCoinAddress(coinAddress);
       try {
+        Model.addCoinAddress(coinAddress);
         Model.WalletWorker walletWorker = Model.getWalletWorker();
         walletWorker.execute();
       }

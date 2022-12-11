@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -127,9 +128,14 @@ public class WalletPanel extends JPanel
       Integer row= walletTable.getSelectedRow();
       if(row != null){
         String s = (String) tableModel.getValueAt(row, 2);
-        Model.deleteCoin(s);
-        tableModel.removeRow(row);
-        walletTable.updateUI();
+        try {
+          Model.deleteCoin(s);
+          tableModel.removeRow(row);
+          walletTable.updateUI();
+        }
+        catch (Exception ex) {
+          new ErrorDialog(ex.getMessage());
+        }
       }
       else {
         new ErrorDialog("Please select a coin!");

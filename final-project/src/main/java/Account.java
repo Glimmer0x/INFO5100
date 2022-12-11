@@ -63,21 +63,24 @@ public class Account
   }
 
   public String getBalance(){
+    System.out.println("Start ----- query ether balance");
     String ethBalance = "0";
     try{
       ethBalance = getEthBalance(web3j, address).toString();
     } catch (Exception e){
       new ErrorDialog(e.getMessage());
     }
-
+    System.out.println("End ----- query ether balance");
     return ethBalance;
   }
   public String getCoinBalance(String coinAddress) throws ExecutionException, InterruptedException, TimeoutException
   {
+    System.out.println("Start ----- query coin balance");
     ERC20 coin = ERC20.load(coinAddress, web3j, credentials, new DefaultGasProvider());
     BigInteger decimal = coin.decimals().sendAsync().get(5, TimeUnit.SECONDS);
     BigInteger tokenBalance = coin.balanceOf(address).sendAsync().get(5, TimeUnit.SECONDS);
     BigDecimal balance = new BigDecimal(tokenBalance).divide(new BigDecimal(Math.pow(10, decimal.intValue())));
+    System.out.println("End ----- query coin balance");
     return balance.toString();
   }
 
@@ -102,6 +105,14 @@ public class Account
     coinInfo.add(balance.toString());
     coinInfo.add(coinAddress);
     return coinInfo;
+  }
+
+  public String getCoinNameByAddress(String coinAddress)
+      throws ExecutionException, InterruptedException, TimeoutException
+  {
+    ERC20 coin = ERC20.load(coinAddress, web3j, credentials, new DefaultGasProvider());
+    String symbol = coin.symbol().sendAsync().get(5, TimeUnit.SECONDS);
+    return symbol;
   }
 
   public Vector<String> transferCoin(String coinAddress, String receiver, Double amount)

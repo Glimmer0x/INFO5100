@@ -2,8 +2,10 @@ import org.web3j.protocol.exceptions.TransactionException;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -18,21 +20,28 @@ import java.util.concurrent.TimeoutException;
 public class Model
 {
   private static Account account = new Account();
+  private static WalletDataBase wDB;
+  private static Vector<Vector<String>> transactionTable = new Vector<Vector<String>>();
 
-  private static HashMap<String, Integer> walletTableMap;
-  private static Vector<Vector<String>> walletTable = new Vector<Vector<String>>();
-  private static Vector<Vector<String>> transactionTable = new Vector<>();
   private static ArrayList<String> coins = new ArrayList<>(){
     {
-      add("eth");
-      add("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684");
+      // add("eth");
+      // add("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684");
       // add("0x8BaBbB98678facC7342735486C851ABD7A0d17Ca");
     }
   };
 
-  public Model() throws ExecutionException, InterruptedException, TimeoutException
+  private static HashMap<String, Integer> walletTableMap = new HashMap<>();;
+  private static Vector<Vector<String>> walletTable = new Vector<Vector<String>>();
+
+
+
+  public Model() throws SQLException, ClassNotFoundException
   {
-    walletTableMap = initWalletTableMap();
+
+    wDB = new WalletDataBase();
+    initTransTable();
+    initWalletCoins();
   }
 
   public static Account getAccount()
@@ -40,13 +49,33 @@ public class Model
     return account;
   }
 
-//  public static Vector<Vector<String>> getWalletTable(){
-//    return walletTable;
-//  }
-
   public static Vector<Vector<String>> getTransactionTable()
   {
     return transactionTable;
+  }
+
+  public static void initWalletCoins() throws SQLException
+  {
+    List<Coin> cl = wDB.getAllCoins();
+    for (Coin c: cl
+         ) {
+      String coinAddress = c.getAddress();
+      Vector<String> coinRow = new Vector<>();
+      String coinBalance = "Querying...";
+      if(coinAddress.equals("eth")){
+        coinRow.add(c.getName());
+        coinRow.add(coinBalance);
+        coinRow.add("The Gas. No Address");
+      }
+      else {
+        coinRow.add(c.getName());
+        coinRow.add(coinBalance);
+        coinRow.add(coinAddress);
+      }
+      coins.add(coinAddress);
+      walletTableMap.put(coinAddress, walletTable.size());
+      walletTable.add(coinRow);
+    }
   }
 
   public static HashMap<String,Integer> initWalletTableMap()
@@ -78,48 +107,27 @@ public class Model
     return walletTable;
   }
 
-  public static void updateWalletTableMap() throws ExecutionException, InterruptedException, TimeoutException
+  public static void addCoinAddress(String s)
   {
-    for (String key: coins
-         ) {
-      if(key.equals("eth")){
-        Vector<String> ethRow = walletTable.get(walletTableMap.get(key));
-        String preBalance = ethRow.get(1);
-        String newBalance = account.getBalance();
-        if(!preBalance.equals(newBalance)) ethRow.set(1 , newBalance);
-      }
-      else{
-        if(walletTableMap.containsKey(key)){
-          Vector<String> coinRow = walletTable.get(walletTableMap.get(key));
-          String preBalance = coinRow.get(1);
-          String newBalance = account.getCoinBalance(key);
-          if(!preBalance.equals(newBalance)) coinRow.set(1 , newBalance);
-        }
-        else {
-          Vector<String> coinRow = account.getCoinInfoByAddress(key);
-          walletTableMap.put(key, walletTable.size());
-          walletTable.add(coinRow);
-        }
-      }
-    }
-  }
-
-  public static void addCoinAddress(String s){
     coins.add(s);
   }
 
-  public static void deleteCoin(String s){
+  public static void deleteCoin(String s) throws SQLException
+  {
     if(s.contains("GAS")) s = "eth";
     Integer idx = walletTableMap.get(s);
+    wDB.deleteCoinByAddress(coins.get(idx));
     coins.remove(idx);
     walletTable.remove(idx);
   }
 
-  public static void transferCoin(String coinAddress, String receiver, Double amount)
-      throws IOException, ExecutionException, InterruptedException, TimeoutException
+  public static void initTransTable() throws SQLException
   {
-    Vector<String> transLog = account.transferCoin(coinAddress, receiver, amount);
-    transactionTable.add(transLog);
+    List<TransactionRecord> transList = wDB.getAllTransactions();
+    for (TransactionRecord transLog: transList
+         ) {
+      transactionTable.add(transLog.getTransaction());
+    }
   }
 
   public static WalletWorker getWalletWorker(){
@@ -132,6 +140,7 @@ public class Model
     public HashMap<String, Vector<String>> doInBackground()
         throws ExecutionException, InterruptedException, TimeoutException
     {
+      System.out.println("Start ----- Query all coins");
       HashMap<String, Vector<String>> map = new HashMap<>();
       for (String key: coins
       ) {
@@ -160,7 +169,7 @@ public class Model
           }
         }
       }
-
+      System.out.println("End ----- Query all coins");
       return map;
     }
 
@@ -178,6 +187,10 @@ public class Model
           else{
             walletTableMap.put(key, walletTable.size());
             walletTable.add(newMap.get(key));
+            Coin c = new Coin();
+            String name = newMap.get(key).get(0);
+            c.setCoin(key, name);
+            wDB.addCoin(c);
           }
         }
         WalletPanel.updateTableUI();
@@ -225,6 +238,9 @@ public class Model
         Vector<String> aTrans = get();
         transactionTable.add(aTrans);
         TransactionPanel.updateTableUI();
+        TransactionRecord t = new TransactionRecord();
+        t.setTransactionByVector(aTrans);
+        wDB.addTransaction(t);
       } catch (Exception ex) {
         new ErrorDialog(ex.getMessage());
       }
