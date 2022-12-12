@@ -43,7 +43,7 @@ public class Account
       credentials = Credentials.create(keyPair);
       address = Keys.toChecksumAddress(Keys.getAddress(keyPair));
     } catch (Exception e){
-      new ErrorDialog(e.getMessage());
+      new ErrorDialog(e.getMessage()).setVisible(true);
     }
   }
 
@@ -68,7 +68,7 @@ public class Account
     try{
       ethBalance = getEthBalance(web3j, address).toString();
     } catch (Exception e){
-      new ErrorDialog(e.getMessage());
+      new ErrorDialog(e.getMessage()).setVisible(true);
     }
     System.out.println("End ----- query ether balance");
     return ethBalance;

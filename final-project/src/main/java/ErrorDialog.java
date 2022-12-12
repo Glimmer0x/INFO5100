@@ -19,6 +19,7 @@ public class ErrorDialog extends JDialog
   public ErrorDialog(String hint){
     dialogPanel = new JPanel();
     labelText = new JLabel(hint, JLabel.CENTER);
+    cancelButton = new JButton("Close");
     confirmButton = new JButton("Confirm");
 
     setSize(200, 100);
@@ -59,6 +60,10 @@ public class ErrorDialog extends JDialog
   }
 
   public void initListener(){
+    cancelButton.addActionListener(e -> {
+      setVisible(false);
+      dispose();
+    });
     confirmButton.addActionListener(e -> {
       setVisible(false);
       dispose();

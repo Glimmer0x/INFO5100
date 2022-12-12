@@ -17,7 +17,7 @@ public class MainFrame extends JFrame
       model = new Model();
     }
     catch (Exception ex) {
-      new ErrorDialog(ex.getMessage());
+      new ErrorDialog(ex.getMessage()).setVisible(true);
     }
   }
 

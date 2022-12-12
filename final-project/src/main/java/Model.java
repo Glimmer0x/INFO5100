@@ -116,9 +116,18 @@ public class Model
   {
     if(s.contains("GAS")) s = "eth";
     Integer idx = walletTableMap.get(s);
+    Integer lastIdx = walletTable.size() - 1;
+    Vector<String> lastRow = walletTable.get(lastIdx);
+
     wDB.deleteCoinByAddress(coins.get(idx));
-    coins.remove(idx);
-    walletTable.remove(idx);
+
+    walletTable.set(idx, lastRow);
+    walletTable.remove(lastIdx);
+    walletTableMap.remove(s);
+    walletTableMap.put(lastRow.get(2), idx);
+//
+//    coins.remove(idx);
+//    walletTable.remove(idx);
   }
 
   public static void initTransTable() throws SQLException
@@ -145,13 +154,24 @@ public class Model
       for (String key: coins
       ) {
         if(key.equals("eth")){
-          Vector<String> ethRow = new Vector<>(walletTable.get(walletTableMap.get(key)));
-          String preBalance = ethRow.get(1);
-          String newBalance = account.getBalance();
-          if(!preBalance.equals(newBalance)) {
-            ethRow.set(1 , newBalance);
+          if(walletTableMap.containsKey(key)){
+            Vector<String> ethRow = new Vector<>(walletTable.get(walletTableMap.get(key)));
+            String preBalance = ethRow.get(1);
+            String newBalance = account.getBalance();
+            if(!preBalance.equals(newBalance)) {
+              ethRow.set(1 , newBalance);
+              map.put(key, ethRow);
+            }
+          }
+          else{
+            Vector<String> ethRow = new Vector<>();
+            ethRow.add("BNB");
+            String ethBalance = account.getBalance();
+            ethRow.add(ethBalance);
+            ethRow.add("The Gas. No Address");
             map.put(key, ethRow);
           }
+
         }
         else{
           if(walletTableMap.containsKey(key)){
@@ -196,7 +216,7 @@ public class Model
         WalletPanel.updateTableUI();
 
       } catch (Exception ex) {
-        new ErrorDialog(ex.getMessage());
+        new ErrorDialog(ex.getMessage()).setVisible(true);
       }
     }
   }
@@ -242,7 +262,7 @@ public class Model
         t.setTransactionByVector(aTrans);
         wDB.addTransaction(t);
       } catch (Exception ex) {
-        new ErrorDialog(ex.getMessage());
+        new ErrorDialog(ex.getMessage()).setVisible(true);
       }
     }
   }

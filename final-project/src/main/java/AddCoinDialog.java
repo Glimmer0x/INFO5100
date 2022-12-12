@@ -20,7 +20,7 @@ public class AddCoinDialog extends AddDialog
         walletWorker.execute();
       }
       catch (Exception ex) {
-        new ErrorDialog(ex.getMessage());
+        new ErrorDialog(ex.getMessage()).setVisible(true);
       }
       dispose();
     });

@@ -117,7 +117,7 @@ public class WalletPanel extends JPanel
         walletWorker.execute();
       }
       catch (Exception ex) {
-        new ErrorDialog(ex.getMessage());
+        new ErrorDialog(ex.getMessage()).setVisible(true);
       }
 
     });
@@ -128,13 +128,14 @@ public class WalletPanel extends JPanel
       Integer row= walletTable.getSelectedRow();
       if(row != null){
         String s = (String) tableModel.getValueAt(row, 2);
+        if(s.contains("Gas")) s = "eth";
         try {
           Model.deleteCoin(s);
           tableModel.removeRow(row);
           walletTable.updateUI();
         }
         catch (Exception ex) {
-          new ErrorDialog(ex.getMessage());
+          new ErrorDialog(ex.getMessage()).setVisible(true);
         }
       }
       else {

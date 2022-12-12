@@ -121,7 +121,7 @@ public class TransferToOneDialog extends JDialog
         transactionWorker.execute();
       }
       catch (Exception ex) {
-        new ErrorDialog(ex.getMessage());
+        new ErrorDialog(ex.getMessage()).setVisible(true);
       }
       dispose();
     });
