@@ -9,7 +9,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @ClassNAME walletPanel
- * @Description TODO
+ * @Description Wallet Tab
  * @Author glimmer
  * @Date 2022/12/5 15:38
  * @Version 1.0
@@ -119,19 +119,24 @@ public class WalletPanel extends JPanel
       catch (Exception ex) {
         new ErrorDialog(ex.getMessage()).setVisible(true);
       }
-
     });
     addButton.addActionListener(e -> {
       new AddCoinDialog().setVisible(true);
     });
+
     deleteButton.addActionListener(e -> {
       Integer row= walletTable.getSelectedRow();
-      if(row != null){
+      Integer lastRow = walletTable.getRowCount();
+      System.out.println(row);
+      if(row.intValue() != -1){
         String s = (String) tableModel.getValueAt(row, 2);
         if(s.contains("Gas")) s = "eth";
         try {
+          System.out.println("Delete " + s);
           Model.deleteCoin(s);
-          tableModel.removeRow(row);
+          // tableModel.removeRow(row);
+          if(row==lastRow-1) tableModel.removeRow(row);
+          else tableModel.removeRow(lastRow-1);
           walletTable.updateUI();
         }
         catch (Exception ex) {
@@ -139,7 +144,7 @@ public class WalletPanel extends JPanel
         }
       }
       else {
-        new ErrorDialog("Please select a coin!");
+        new ErrorDialog("Please select a coin!").setVisible(true);
       }
     });
     transferToOneButton.addActionListener(e -> {
@@ -149,7 +154,7 @@ public class WalletPanel extends JPanel
         new TransferToOneDialog(s).setVisible(true);
       }
       else {
-        new ErrorDialog("Please select a coin!");
+        new ErrorDialog("Please select a coin!").setVisible(true);
       }
     });
     // transferToBatch.addActionListener(e -> new BatchTransferDialog().setVisible(true));

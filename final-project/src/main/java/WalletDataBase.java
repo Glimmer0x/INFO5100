@@ -42,6 +42,16 @@ public class WalletDataBase
     transDao = DaoManager.createDao(connection, TransactionRecord.class);
   }
 
+  public void cleanAllCoins() throws SQLException
+  {
+    coinDao.delete(coinDao.queryForAll());
+  }
+
+  public void cleanAllTrans() throws SQLException
+  {
+    transDao.delete(transDao.queryForAll());
+  }
+
   public List<Coin> getAllCoins() throws SQLException
   {
     return coinDao.queryForAll();
@@ -111,12 +121,8 @@ public class WalletDataBase
   public static void main(String[] args) throws Exception
   {
     WalletDataBase w = new WalletDataBase();
-    Coin bnb = new Coin();
-    bnb.setCoin("eth", "BNB");
-    Coin usdt = new Coin();
-    usdt.setCoin("0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684", "USDT");
-    w.addCoin(bnb);
-    w.addCoin(usdt);
+    w.cleanAllCoins();
+    w.cleanAllTrans();
   }
 
 

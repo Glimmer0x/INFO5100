@@ -44,7 +44,7 @@ public class MainFrame extends JFrame
     initLayout();
     initListener();
 
-    setTitle("Your own wallet");
+    setTitle("My Wallet");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     setContentPane(mainPanel);

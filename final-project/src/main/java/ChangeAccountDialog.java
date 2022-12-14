@@ -10,7 +10,12 @@ public class ChangeAccountDialog extends AddDialog
   public ChangeAccountDialog(){
     super("Import a new private key:");
     super.setConfirmListener(e -> {
-      MainFrame.getModel().getAccount().setKey(super.getInput());
+      String newKey = super.getInput();
+      if(newKey.equals("")){
+        new ErrorDialog("Please input a private key!").setVisible(true);
+        return;
+      }
+      MainFrame.getModel().getAccount().setKey(newKey);
       setVisible(false);
       dispose();
     });

@@ -19,10 +19,11 @@ public class ErrorDialog extends JDialog
   public ErrorDialog(String hint){
     dialogPanel = new JPanel();
     labelText = new JLabel(hint, JLabel.CENTER);
+    labelText.setEnabled(false);
     cancelButton = new JButton("Close");
     confirmButton = new JButton("Confirm");
 
-    setSize(200, 100);
+    setSize(600, 100);
 
     initLayout();
     initListener();
@@ -40,7 +41,7 @@ public class ErrorDialog extends JDialog
     top.gridx = 0;
     top.gridy = 0;
     top.gridwidth = 2;
-    labelText.setPreferredSize(new Dimension(200,25));
+    labelText.setPreferredSize(new Dimension(600,25));
     dialogPanel.add(labelText, top);
 
     GridBagConstraints rightBottom = new GridBagConstraints();
@@ -48,7 +49,7 @@ public class ErrorDialog extends JDialog
     rightBottom.gridx = 0;
     rightBottom.gridy = 1;
     rightBottom.gridwidth = 2;
-    confirmButton.setPreferredSize(new Dimension(200,25));
+    confirmButton.setPreferredSize(new Dimension(600,25));
     dialogPanel.add(confirmButton, rightBottom);
 
     add(dialogPanel);

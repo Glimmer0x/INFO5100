@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -118,16 +119,24 @@ public class Model
     Integer idx = walletTableMap.get(s);
     Integer lastIdx = walletTable.size() - 1;
     Vector<String> lastRow = walletTable.get(lastIdx);
-
     wDB.deleteCoinByAddress(coins.get(idx));
 
-    walletTable.set(idx, lastRow);
-    walletTable.remove(lastIdx);
-    walletTableMap.remove(s);
-    walletTableMap.put(lastRow.get(2), idx);
-//
-//    coins.remove(idx);
-//    walletTable.remove(idx);
+    if(idx==lastIdx){
+      walletTable.remove(idx);
+      walletTableMap.remove(s);
+      coins.remove(idx.intValue());
+    }
+    else{
+      walletTable.set(idx, lastRow);
+      walletTable.remove(lastIdx);
+      walletTableMap.remove(s);
+      String lastAddress = lastRow.get(2);
+      lastAddress = lastAddress.contains("Gas") ? "eth" : lastAddress;
+      walletTableMap.put(lastAddress, idx);
+      coins.remove(lastIdx.intValue());
+      coins.set(idx, lastAddress);
+    }
+
   }
 
   public static void initTransTable() throws SQLException
